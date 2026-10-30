@@ -1,0 +1,723 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="theme-color" content="#6d4aff" />
+  <title>Agenda B2B & Metas</title>
+  <style>
+    :root{
+      --bg:#f6f7fb;
+      --card:#ffffff;
+      --text:#1c2230;
+      --muted:#72798b;
+      --primary:#6d4aff;
+      --primary2:#8b73ff;
+      --success:#18a66a;
+      --danger:#e1495b;
+      --warning:#f1a62a;
+      --border:#e8e9f0;
+      --shadow:0 10px 30px rgba(31,35,48,.08);
+      --radius:18px;
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      font-family:Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background:var(--bg);
+      color:var(--text);
+    }
+    button,input,textarea,select{font:inherit}
+    button{cursor:pointer}
+    .app{max-width:1180px;margin:0 auto;padding:18px 16px 88px}
+    .topbar{
+      display:flex;justify-content:space-between;gap:14px;align-items:center;
+      margin-bottom:18px;
+    }
+    .brand h1{font-size:clamp(22px,4vw,34px);margin:0}
+    .brand p{margin:5px 0 0;color:var(--muted);font-size:14px}
+    .top-actions{display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end}
+    .btn{
+      border:0;border-radius:12px;padding:10px 14px;font-weight:700;
+      transition:.2s;display:inline-flex;align-items:center;justify-content:center;gap:7px;
+    }
+    .btn:active{transform:scale(.98)}
+    .btn-primary{background:var(--primary);color:white}
+    .btn-soft{background:#efedff;color:var(--primary)}
+    .btn-danger{background:#fff0f2;color:var(--danger)}
+    .btn-success{background:#eaf8f1;color:var(--success)}
+    .btn-ghost{background:#fff;border:1px solid var(--border);color:var(--text)}
+    .tabs{
+      background:#fff;border:1px solid var(--border);padding:7px;border-radius:15px;
+      display:grid;grid-template-columns:repeat(4,1fr);gap:6px;position:sticky;top:8px;z-index:20;
+      box-shadow:0 8px 20px rgba(31,35,48,.05);
+      margin-bottom:18px;
+    }
+    .tab-btn{
+      border:0;background:transparent;padding:11px 8px;border-radius:10px;font-weight:800;color:var(--muted)
+    }
+    .tab-btn.active{background:var(--primary);color:#fff}
+    .tab{display:none}
+    .tab.active{display:block}
+    .grid{display:grid;gap:14px}
+    .grid-4{grid-template-columns:repeat(4,minmax(0,1fr))}
+    .grid-2{grid-template-columns:repeat(2,minmax(0,1fr))}
+    .card{
+      background:var(--card);border:1px solid var(--border);border-radius:var(--radius);
+      box-shadow:var(--shadow);padding:16px;
+    }
+    .metric .label{font-size:13px;color:var(--muted);font-weight:700}
+    .metric .value{font-size:26px;font-weight:900;margin-top:5px}
+    .metric .small{font-size:12px;color:var(--muted);margin-top:3px}
+    .progress{
+      background:#ececf3;height:12px;border-radius:999px;overflow:hidden;margin-top:12px
+    }
+    .progress > div{
+      height:100%;width:0%;background:linear-gradient(90deg,var(--primary),var(--primary2));border-radius:999px;
+      transition:.35s;
+    }
+    .section-title{
+      display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:12px
+    }
+    .section-title h2,.section-title h3{margin:0}
+    .section-title h2{font-size:20px}
+    .section-title h3{font-size:17px}
+    .muted{color:var(--muted)}
+    .small{font-size:12px}
+    .form-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+    .field{display:flex;flex-direction:column;gap:6px}
+    .field.full{grid-column:1/-1}
+    .field label{font-size:12px;font-weight:800;color:var(--muted)}
+    .field input,.field textarea,.field select{
+      width:100%;border:1px solid var(--border);border-radius:12px;background:#fff;
+      padding:11px 12px;outline:none;color:var(--text)
+    }
+    .field textarea{min-height:84px;resize:vertical}
+    .field input:focus,.field textarea:focus,.field select:focus{
+      border-color:#b7aaff;box-shadow:0 0 0 3px rgba(109,74,255,.08)
+    }
+    .list{display:flex;flex-direction:column;gap:10px}
+    .item{
+      border:1px solid var(--border);border-radius:14px;padding:12px;background:#fff;
+      display:flex;align-items:flex-start;justify-content:space-between;gap:10px
+    }
+    .item-main{min-width:0}
+    .item-title{font-weight:900}
+    .item-sub{font-size:13px;color:var(--muted);margin-top:4px;line-height:1.35}
+    .item-actions{display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end}
+    .pill{
+      display:inline-flex;align-items:center;gap:5px;padding:5px 8px;border-radius:999px;
+      font-size:11px;font-weight:900;margin-top:6px;
+    }
+    .pill.pending{background:#fff5dd;color:#a56c00}
+    .pill.done{background:#e9f8f1;color:#0f8c5a}
+    .pill.cancelled{background:#fff0f2;color:#c6384a}
+    .pill.contact{background:#eeebff;color:#6248d9}
+    .empty{text-align:center;color:var(--muted);padding:24px 12px;border:1px dashed var(--border);border-radius:14px}
+    .calendar-head{
+      display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:10px
+    }
+    .calendar-week,.calendar-grid{
+      display:grid;grid-template-columns:repeat(7,1fr);gap:6px
+    }
+    .calendar-week div{
+      text-align:center;font-size:11px;color:var(--muted);font-weight:900;padding:5px
+    }
+    .day{
+      aspect-ratio:1/1;min-height:72px;border:1px solid var(--border);border-radius:12px;
+      background:#fff;padding:7px;position:relative;overflow:hidden
+    }
+    .day.other{opacity:.38}
+    .day.today{border:2px solid var(--primary)}
+    .day-number{font-weight:900;font-size:12px}
+    .dot-wrap{display:flex;gap:4px;flex-wrap:wrap;margin-top:6px}
+    .dot{width:7px;height:7px;border-radius:50%;background:var(--primary)}
+    .day-count{font-size:10px;color:var(--muted);margin-top:5px}
+    .summary-row{display:flex;gap:10px;flex-wrap:wrap}
+    .summary-chip{
+      background:#f3f1ff;color:#5940ca;padding:8px 10px;border-radius:10px;font-size:12px;font-weight:800
+    }
+    .month-picker{
+      display:flex;align-items:center;gap:8px;flex-wrap:wrap
+    }
+    .month-picker input{border:1px solid var(--border);border-radius:10px;padding:8px 10px;background:#fff}
+    table{width:100%;border-collapse:collapse}
+    th,td{padding:10px 8px;border-bottom:1px solid var(--border);text-align:left;font-size:13px;vertical-align:top}
+    th{color:var(--muted);font-size:11px;text-transform:uppercase}
+    .table-wrap{overflow:auto}
+    .sale-cancelled{text-decoration:line-through;opacity:.55}
+    .modal{
+      position:fixed;inset:0;background:rgba(19,21,31,.55);z-index:1000;display:none;align-items:center;justify-content:center;padding:18px
+    }
+    .modal.show{display:flex}
+    .modal-card{
+      width:min(560px,100%);max-height:85vh;overflow:auto;background:#fff;border-radius:22px;padding:18px;
+      box-shadow:0 24px 70px rgba(0,0,0,.25)
+    }
+    .modal-card h2{margin:0}
+    .notice{
+      background:#f5f3ff;border:1px solid #ddd7ff;color:#4e3cb2;border-radius:13px;padding:11px 12px;
+      font-size:13px;line-height:1.4
+    }
+    .danger-note{
+      background:#fff2f4;border:1px solid #ffd7dc;color:#9a2d3a;border-radius:13px;padding:11px 12px;font-size:13px
+    }
+    .backup-row{display:flex;gap:8px;flex-wrap:wrap}
+    @media (max-width:820px){
+      .grid-4{grid-template-columns:repeat(2,1fr)}
+      .grid-2{grid-template-columns:1fr}
+      .topbar{align-items:flex-start;flex-direction:column}
+      .top-actions{justify-content:flex-start}
+    }
+    @media (max-width:560px){
+      .app{padding:12px 10px 86px}
+      .tabs{grid-template-columns:repeat(4,1fr)}
+      .tab-btn{font-size:11px;padding:10px 4px}
+      .grid-4{grid-template-columns:1fr 1fr}
+      .form-grid{grid-template-columns:1fr}
+      .field.full{grid-column:auto}
+      .metric .value{font-size:22px}
+      .day{min-height:54px;padding:5px;border-radius:9px}
+      .dot-wrap{gap:2px}
+      .item{flex-direction:column}
+      .item-actions{justify-content:flex-start}
+    }
+  </style>
+</head>
+<body>
+<div class="app">
+  <div class="topbar">
+    <div class="brand">
+      <h1>Agenda B2B & Metas</h1>
+      <p>Cobranças, clientes, pedidos e acompanhamento mensal em um só lugar.</p>
+    </div>
+    <div class="top-actions">
+      <button class="btn btn-soft" onclick="requestNotifications()">🔔 Ativar notificações</button>
+      <button class="btn btn-ghost" onclick="openTodayModal()">📌 Lembretes de hoje</button>
+    </div>
+  </div>
+
+  <div class="tabs">
+    <button class="tab-btn active" data-tab="dashboard">Resumo</button>
+    <button class="tab-btn" data-tab="agenda">Agenda</button>
+    <button class="tab-btn" data-tab="vendas">Vendas</button>
+    <button class="tab-btn" data-tab="dados">Dados</button>
+  </div>
+
+  <section id="dashboard" class="tab active">
+    <div class="grid grid-4" style="margin-bottom:14px">
+      <div class="card metric"><div class="label">Meta do mês</div><div id="mGoal" class="value">R$ 0,00</div><div class="small" id="mMonth"></div></div>
+      <div class="card metric"><div class="label">Vendido válido</div><div id="mSold" class="value">R$ 0,00</div><div class="small" id="mSalesCount">0 vendas</div></div>
+      <div class="card metric"><div class="label">Falta para a meta</div><div id="mRemaining" class="value">R$ 0,00</div><div class="small" id="mPct">0% atingido</div></div>
+      <div class="card metric"><div class="label">Cobranças hoje</div><div id="mToday" class="value">0</div><div class="small">pendentes para contato</div></div>
+    </div>
+
+    <div class="card" style="margin-bottom:14px">
+      <div class="section-title">
+        <h3>Progresso da meta</h3>
+        <div class="month-picker">
+          <label class="small muted">Mês:</label>
+          <input type="month" id="dashboardMonth" onchange="setActiveMonth(this.value)" />
+        </div>
+      </div>
+      <div class="progress"><div id="progressBar"></div></div>
+      <div class="summary-row" style="margin-top:10px">
+        <div class="summary-chip" id="avgTicket">Ticket médio: R$ 0,00</div>
+        <div class="summary-chip" id="daysInfo">0 dias restantes</div>
+        <div class="summary-chip" id="dailyNeeded">Média necessária/dia: R$ 0,00</div>
+      </div>
+    </div>
+
+    <div class="grid grid-2">
+      <div class="card">
+        <div class="section-title"><h3>Hoje</h3><button class="btn btn-soft" onclick="switchTab('agenda')">Abrir agenda</button></div>
+        <div id="todayList" class="list"></div>
+      </div>
+      <div class="card">
+        <div class="section-title"><h3>Próximas cobranças</h3><span class="small muted">7 dias</span></div>
+        <div id="upcomingList" class="list"></div>
+      </div>
+    </div>
+  </section>
+
+  <section id="agenda" class="tab">
+    <div class="grid grid-2">
+      <div class="card">
+        <div class="section-title"><h2>Novo lembrete</h2><span class="small muted">Cobrança ou retorno</span></div>
+        <form id="reminderForm" class="form-grid">
+          <input type="hidden" id="reminderId" />
+          <div class="field"><label>Cliente</label><input id="reminderClient" required placeholder="Ex.: Loja Bella" /></div>
+          <div class="field"><label>Data</label><input id="reminderDate" required type="date" /></div>
+          <div class="field"><label>Horário</label><input id="reminderTime" type="time" /></div>
+          <div class="field"><label>Telefone / WhatsApp</label><input id="reminderPhone" inputmode="tel" placeholder="Opcional" /></div>
+          <div class="field full"><label>Anotação</label><textarea id="reminderNote" placeholder="Ex.: cobrar pedido 458, confirmar pagamento, mandar nova coleção..."></textarea></div>
+          <div class="field"><label>Status</label>
+            <select id="reminderStatus">
+              <option value="pending">Pendente</option>
+              <option value="contact">Contatado</option>
+              <option value="done">Resolvido</option>
+            </select>
+          </div>
+          <div class="field" style="justify-content:end"><button class="btn btn-primary" type="submit">Salvar lembrete</button></div>
+        </form>
+      </div>
+
+      <div class="card">
+        <div class="calendar-head">
+          <button class="btn btn-ghost" onclick="moveCalendar(-1)">←</button>
+          <h3 id="calendarTitle" style="margin:0"></h3>
+          <button class="btn btn-ghost" onclick="moveCalendar(1)">→</button>
+        </div>
+        <div class="calendar-week"><div>Dom</div><div>Seg</div><div>Ter</div><div>Qua</div><div>Qui</div><div>Sex</div><div>Sáb</div></div>
+        <div id="calendarGrid" class="calendar-grid"></div>
+      </div>
+    </div>
+
+    <div class="card" style="margin-top:14px">
+      <div class="section-title">
+        <h3>Todos os lembretes</h3>
+        <div class="month-picker">
+          <input type="search" id="agendaSearch" placeholder="Pesquisar cliente..." oninput="renderReminderList()" />
+          <select id="agendaFilter" onchange="renderReminderList()" style="border:1px solid var(--border);border-radius:10px;padding:8px 10px;background:#fff">
+            <option value="all">Todos</option>
+            <option value="pending">Pendentes</option>
+            <option value="contact">Contatados</option>
+            <option value="done">Resolvidos</option>
+          </select>
+        </div>
+      </div>
+      <div id="reminderList" class="list"></div>
+    </div>
+  </section>
+
+  <section id="vendas" class="tab">
+    <div class="grid grid-2">
+      <div class="card">
+        <div class="section-title"><h2>Meta mensal</h2><span class="small muted">salva por mês</span></div>
+        <div class="form-grid">
+          <div class="field"><label>Mês</label><input type="month" id="goalMonth" /></div>
+          <div class="field"><label>Valor da meta</label><input type="number" step="0.01" min="0" id="goalValue" placeholder="0,00" /></div>
+          <div class="field full"><button class="btn btn-primary" onclick="saveGoal()" type="button">Salvar meta</button></div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="section-title"><h2>Lançar venda</h2><span class="small muted">pedido fechado</span></div>
+        <form id="saleForm" class="form-grid">
+          <input type="hidden" id="saleId" />
+          <div class="field"><label>Data da venda</label><input type="date" id="saleDate" required /></div>
+          <div class="field"><label>Valor</label><input type="number" step="0.01" min="0" id="saleValue" required placeholder="0,00" /></div>
+          <div class="field"><label>Cliente</label><input id="saleClient" placeholder="Opcional" /></div>
+          <div class="field"><label>Nº pedido</label><input id="saleOrder" placeholder="Opcional" /></div>
+          <div class="field full"><label>Observação</label><input id="saleNote" placeholder="Opcional" /></div>
+          <div class="field full"><button class="btn btn-primary" type="submit">Adicionar venda</button></div>
+        </form>
+      </div>
+    </div>
+
+    <div class="card" style="margin-top:14px">
+      <div class="section-title">
+        <h3>Vendas do mês</h3>
+        <div class="month-picker">
+          <input type="month" id="salesMonth" onchange="setActiveMonth(this.value)" />
+        </div>
+      </div>
+      <div class="notice" style="margin-bottom:12px">
+        Se uma venda for cancelada ou devolvida, use <strong>Anular venda</strong>. O valor deixa de contar na meta, mas o registro continua salvo no histórico.
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Data</th><th>Cliente / Pedido</th><th>Valor</th><th>Status</th><th>Ações</th></tr></thead>
+          <tbody id="salesTable"></tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <section id="dados" class="tab">
+    <div class="grid grid-2">
+      <div class="card">
+        <div class="section-title"><h2>Backup dos dados</h2></div>
+        <p class="muted">Nesta versão, tudo fica salvo no próprio aparelho/navegador. Faça backup de tempos em tempos.</p>
+        <div class="backup-row">
+          <button class="btn btn-primary" onclick="exportData()">Baixar backup</button>
+          <label class="btn btn-soft" style="cursor:pointer">
+            Importar backup
+            <input type="file" id="importFile" accept=".json,application/json" hidden onchange="importData(event)" />
+          </label>
+        </div>
+      </div>
+      <div class="card">
+        <div class="section-title"><h2>Limpeza</h2></div>
+        <div class="danger-note">Apagar dados remove lembretes, metas e vendas deste navegador.</div>
+        <button class="btn btn-danger" style="margin-top:12px" onclick="clearAllData()">Apagar todos os dados</button>
+      </div>
+    </div>
+  </section>
+</div>
+
+<div id="todayModal" class="modal" onclick="if(event.target===this) closeTodayModal()">
+  <div class="modal-card">
+    <div class="section-title">
+      <div>
+        <h2>Lembretes de hoje</h2>
+        <div class="small muted" id="todayModalDate"></div>
+      </div>
+      <button class="btn btn-ghost" onclick="closeTodayModal()">Fechar</button>
+    </div>
+    <div id="todayModalList" class="list"></div>
+  </div>
+</div>
+
+<script>
+const STORAGE_KEY = "agendaB2B_v1";
+let data = loadData();
+let activeMonth = monthKey(new Date());
+let calendarCursor = new Date(new Date().getFullYear(), new Date().getMonth(), 1);
+
+function defaultData(){
+  return { reminders:[], sales:[], goals:{} };
+}
+function loadData(){
+  try{
+    return {...defaultData(), ...(JSON.parse(localStorage.getItem(STORAGE_KEY)) || {})};
+  }catch(e){ return defaultData(); }
+}
+function saveData(){
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+  renderAll();
+}
+function uid(prefix){ return prefix + "_" + Date.now() + "_" + Math.random().toString(16).slice(2); }
+function isoDateLocal(date = new Date()){
+  const y = date.getFullYear(), m = String(date.getMonth()+1).padStart(2,"0"), d = String(date.getDate()).padStart(2,"0");
+  return `${y}-${m}-${d}`;
+}
+function monthKey(date){
+  const d = date instanceof Date ? date : new Date(date+"T12:00:00");
+  return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}`;
+}
+function brl(v){
+  return Number(v || 0).toLocaleString("pt-BR",{style:"currency",currency:"BRL"});
+}
+function escapeHtml(s=""){
+  return String(s).replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]));
+}
+function formatDate(s){
+  if(!s) return "";
+  return new Date(s+"T12:00:00").toLocaleDateString("pt-BR");
+}
+function formatMonth(ym){
+  const [y,m]=ym.split("-").map(Number);
+  return new Date(y,m-1,1).toLocaleDateString("pt-BR",{month:"long",year:"numeric"});
+}
+function statusLabel(status){
+  return status==="done" ? "Resolvido" : status==="contact" ? "Contatado" : "Pendente";
+}
+function setTodayDefaults(){
+  const today = isoDateLocal();
+  if(!document.getElementById("reminderDate").value) document.getElementById("reminderDate").value = today;
+  if(!document.getElementById("saleDate").value) document.getElementById("saleDate").value = today;
+}
+
+document.querySelectorAll(".tab-btn").forEach(btn=>{
+  btn.addEventListener("click",()=>switchTab(btn.dataset.tab));
+});
+function switchTab(id){
+  document.querySelectorAll(".tab").forEach(x=>x.classList.toggle("active", x.id===id));
+  document.querySelectorAll(".tab-btn").forEach(x=>x.classList.toggle("active", x.dataset.tab===id));
+  window.scrollTo({top:0,behavior:"smooth"});
+}
+
+document.getElementById("reminderForm").addEventListener("submit",e=>{
+  e.preventDefault();
+  const id = document.getElementById("reminderId").value;
+  const item = {
+    id: id || uid("r"),
+    client: document.getElementById("reminderClient").value.trim(),
+    date: document.getElementById("reminderDate").value,
+    time: document.getElementById("reminderTime").value,
+    phone: document.getElementById("reminderPhone").value.trim(),
+    note: document.getElementById("reminderNote").value.trim(),
+    status: document.getElementById("reminderStatus").value,
+    createdAt: Date.now()
+  };
+  if(id){
+    const i=data.reminders.findIndex(x=>x.id===id);
+    if(i>=0) data.reminders[i]=item;
+  }else data.reminders.push(item);
+  e.target.reset();
+  document.getElementById("reminderId").value="";
+  setTodayDefaults();
+  saveData();
+});
+
+function editReminder(id){
+  const r=data.reminders.find(x=>x.id===id); if(!r) return;
+  switchTab("agenda");
+  document.getElementById("reminderId").value=r.id;
+  document.getElementById("reminderClient").value=r.client;
+  document.getElementById("reminderDate").value=r.date;
+  document.getElementById("reminderTime").value=r.time || "";
+  document.getElementById("reminderPhone").value=r.phone || "";
+  document.getElementById("reminderNote").value=r.note || "";
+  document.getElementById("reminderStatus").value=r.status || "pending";
+  window.scrollTo({top:0,behavior:"smooth"});
+}
+function deleteReminder(id){
+  if(!confirm("Excluir este lembrete?")) return;
+  data.reminders=data.reminders.filter(x=>x.id!==id); saveData();
+}
+function setReminderStatus(id,status){
+  const r=data.reminders.find(x=>x.id===id); if(!r) return;
+  r.status=status; saveData();
+}
+function whatsappReminder(id){
+  const r=data.reminders.find(x=>x.id===id); if(!r || !r.phone) return;
+  const number=r.phone.replace(/\D/g,"");
+  const msg=encodeURIComponent(`Olá! Passando para falar sobre ${r.note || "seu pedido"}.`);
+  window.open(`https://wa.me/${number}?text=${msg}`,"_blank");
+}
+
+function reminderCard(r,compact=false){
+  const phoneBtn = r.phone ? `<button class="btn btn-success" onclick="whatsappReminder('${r.id}')">WhatsApp</button>` : "";
+  return `<div class="item">
+    <div class="item-main">
+      <div class="item-title">${escapeHtml(r.client)}</div>
+      <div class="item-sub">${formatDate(r.date)} ${r.time ? "• "+escapeHtml(r.time) : ""}${r.note ? "<br>"+escapeHtml(r.note) : ""}</div>
+      <span class="pill ${r.status}">${statusLabel(r.status)}</span>
+    </div>
+    <div class="item-actions">
+      ${phoneBtn}
+      ${r.status!=="done" ? `<button class="btn btn-success" onclick="setReminderStatus('${r.id}','done')">Resolver</button>` : ""}
+      ${!compact ? `<button class="btn btn-soft" onclick="editReminder('${r.id}')">Editar</button>
+      <button class="btn btn-danger" onclick="deleteReminder('${r.id}')">Excluir</button>` : ""}
+    </div>
+  </div>`;
+}
+function renderReminderList(){
+  const q=(document.getElementById("agendaSearch")?.value || "").toLowerCase();
+  const filter=document.getElementById("agendaFilter")?.value || "all";
+  const list=[...data.reminders]
+    .filter(r=>(filter==="all" || r.status===filter) && (r.client+" "+r.note+" "+r.phone).toLowerCase().includes(q))
+    .sort((a,b)=>(a.date+a.time).localeCompare(b.date+b.time));
+  document.getElementById("reminderList").innerHTML = list.length ? list.map(r=>reminderCard(r)).join("") : `<div class="empty">Nenhum lembrete encontrado.</div>`;
+}
+function renderToday(){
+  const today=isoDateLocal();
+  const todayItems=data.reminders.filter(r=>r.date===today && r.status!=="done").sort((a,b)=>(a.time||"").localeCompare(b.time||""));
+  document.getElementById("todayList").innerHTML=todayItems.length?todayItems.map(r=>reminderCard(r,true)).join(""):`<div class="empty">Nenhuma cobrança pendente para hoje.</div>`;
+  document.getElementById("mToday").textContent=todayItems.length;
+  document.getElementById("todayModalDate").textContent=new Date().toLocaleDateString("pt-BR",{weekday:"long",day:"2-digit",month:"long",year:"numeric"});
+  document.getElementById("todayModalList").innerHTML=todayItems.length?todayItems.map(r=>reminderCard(r,true)).join(""):`<div class="empty">Tudo em dia por aqui.</div>`;
+
+  const end=new Date(); end.setDate(end.getDate()+7);
+  const upcoming=data.reminders.filter(r=>{
+    const d=new Date(r.date+"T12:00:00");
+    return r.status!=="done" && d>new Date(today+"T23:59:59") && d<=end;
+  }).sort((a,b)=>(a.date+a.time).localeCompare(b.date+b.time));
+  document.getElementById("upcomingList").innerHTML=upcoming.length?upcoming.map(r=>reminderCard(r,true)).join(""):`<div class="empty">Nenhuma cobrança nos próximos 7 dias.</div>`;
+}
+function openTodayModal(){ document.getElementById("todayModal").classList.add("show"); }
+function closeTodayModal(){ document.getElementById("todayModal").classList.remove("show"); }
+
+async function requestNotifications(){
+  if(!("Notification" in window)){
+    alert("Este navegador não oferece notificações do sistema. O app continuará mostrando o aviso interno ao abrir.");
+    return;
+  }
+  const p=await Notification.requestPermission();
+  alert(p==="granted" ? "Notificações ativadas." : "Permissão de notificação não concedida.");
+}
+function notifyToday(){
+  const today=isoDateLocal();
+  const pending=data.reminders.filter(r=>r.date===today && r.status!=="done");
+  if(pending.length && "Notification" in window && Notification.permission==="granted"){
+    new Notification(`Você tem ${pending.length} lembrete(s) hoje`,{
+      body: pending.slice(0,3).map(r=>r.client).join(", ") + (pending.length>3 ? "..." : "")
+    });
+  }
+}
+
+document.getElementById("saleForm").addEventListener("submit",e=>{
+  e.preventDefault();
+  const id=document.getElementById("saleId").value;
+  const sale={
+    id:id || uid("s"),
+    date:document.getElementById("saleDate").value,
+    value:Number(document.getElementById("saleValue").value || 0),
+    client:document.getElementById("saleClient").value.trim(),
+    order:document.getElementById("saleOrder").value.trim(),
+    note:document.getElementById("saleNote").value.trim(),
+    cancelled:id ? (data.sales.find(x=>x.id===id)?.cancelled || false) : false,
+    createdAt:Date.now()
+  };
+  if(id){
+    const i=data.sales.findIndex(x=>x.id===id); if(i>=0) data.sales[i]=sale;
+  }else data.sales.push(sale);
+  activeMonth=monthKey(sale.date);
+  e.target.reset();
+  document.getElementById("saleId").value="";
+  setTodayDefaults();
+  saveData();
+});
+function editSale(id){
+  const s=data.sales.find(x=>x.id===id); if(!s) return;
+  document.getElementById("saleId").value=s.id;
+  document.getElementById("saleDate").value=s.date;
+  document.getElementById("saleValue").value=s.value;
+  document.getElementById("saleClient").value=s.client || "";
+  document.getElementById("saleOrder").value=s.order || "";
+  document.getElementById("saleNote").value=s.note || "";
+  window.scrollTo({top:0,behavior:"smooth"});
+}
+function toggleSaleCancelled(id){
+  const s=data.sales.find(x=>x.id===id); if(!s) return;
+  s.cancelled=!s.cancelled;
+  saveData();
+}
+function deleteSale(id){
+  if(!confirm("Excluir esta venda do histórico?")) return;
+  data.sales=data.sales.filter(x=>x.id!==id); saveData();
+}
+function renderSales(){
+  const monthSales=data.sales.filter(s=>s.date.startsWith(activeMonth)).sort((a,b)=>b.date.localeCompare(a.date));
+  const tbody=document.getElementById("salesTable");
+  if(!monthSales.length){
+    tbody.innerHTML=`<tr><td colspan="5" class="muted">Nenhuma venda lançada neste mês.</td></tr>`; return;
+  }
+  tbody.innerHTML=monthSales.map(s=>`
+    <tr class="${s.cancelled ? "sale-cancelled":""}">
+      <td>${formatDate(s.date)}</td>
+      <td><strong>${escapeHtml(s.client || "Sem cliente")}</strong><br><span class="muted">${escapeHtml(s.order ? "Pedido "+s.order : s.note || "")}</span></td>
+      <td><strong>${brl(s.value)}</strong></td>
+      <td>${s.cancelled ? `<span class="pill cancelled">Anulada</span>`:`<span class="pill done">Válida</span>`}</td>
+      <td>
+        <div class="item-actions">
+          <button class="btn ${s.cancelled ? "btn-success":"btn-danger"}" onclick="toggleSaleCancelled('${s.id}')">${s.cancelled ? "Reativar":"Anular venda"}</button>
+          <button class="btn btn-soft" onclick="editSale('${s.id}')">Editar</button>
+          <button class="btn btn-ghost" onclick="deleteSale('${s.id}')">Excluir</button>
+        </div>
+      </td>
+    </tr>`).join("");
+}
+function saveGoal(){
+  const m=document.getElementById("goalMonth").value;
+  const v=Number(document.getElementById("goalValue").value || 0);
+  if(!m){ alert("Escolha o mês."); return; }
+  data.goals[m]=v; activeMonth=m; saveData();
+}
+function setActiveMonth(m){
+  if(!m) return;
+  activeMonth=m;
+  document.getElementById("dashboardMonth").value=m;
+  document.getElementById("salesMonth").value=m;
+  document.getElementById("goalMonth").value=m;
+  document.getElementById("goalValue").value=data.goals[m] ?? "";
+  renderDashboard();
+  renderSales();
+}
+function renderDashboard(){
+  const goal=Number(data.goals[activeMonth] || 0);
+  const validSales=data.sales.filter(s=>s.date.startsWith(activeMonth) && !s.cancelled);
+  const sold=validSales.reduce((a,b)=>a+Number(b.value||0),0);
+  const remaining=Math.max(goal-sold,0);
+  const pct=goal>0 ? (sold/goal)*100 : 0;
+  document.getElementById("mGoal").textContent=brl(goal);
+  document.getElementById("mSold").textContent=brl(sold);
+  document.getElementById("mRemaining").textContent=brl(remaining);
+  document.getElementById("mPct").textContent=`${pct.toFixed(1).replace(".",",")}% atingido`;
+  document.getElementById("mMonth").textContent=formatMonth(activeMonth);
+  document.getElementById("mSalesCount").textContent=`${validSales.length} ${validSales.length===1?"venda":"vendas"}`;
+  document.getElementById("progressBar").style.width=Math.min(pct,100)+"%";
+  const avg=validSales.length ? sold/validSales.length : 0;
+  document.getElementById("avgTicket").textContent="Ticket médio: "+brl(avg);
+
+  const [y,m]=activeMonth.split("-").map(Number);
+  const now=new Date();
+  const last=new Date(y,m,0).getDate();
+  let remainingDays=last;
+  if(now.getFullYear()===y && now.getMonth()+1===m) remainingDays=Math.max(last-now.getDate()+1,1);
+  else if(new Date(y,m-1,1)<new Date(now.getFullYear(),now.getMonth(),1)) remainingDays=0;
+  document.getElementById("daysInfo").textContent=`${remainingDays} ${remainingDays===1?"dia restante":"dias restantes"}`;
+  document.getElementById("dailyNeeded").textContent="Média necessária/dia: "+brl(remainingDays>0 ? remaining/remainingDays : 0);
+}
+function renderCalendar(){
+  const y=calendarCursor.getFullYear(), m=calendarCursor.getMonth();
+  document.getElementById("calendarTitle").textContent=new Date(y,m,1).toLocaleDateString("pt-BR",{month:"long",year:"numeric"});
+  const first=new Date(y,m,1);
+  const start=new Date(y,m,1-first.getDay());
+  const today=isoDateLocal();
+  let html="";
+  for(let i=0;i<42;i++){
+    const d=new Date(start); d.setDate(start.getDate()+i);
+    const iso=isoDateLocal(d);
+    const events=data.reminders.filter(r=>r.date===iso && r.status!=="done");
+    html+=`<div class="day ${d.getMonth()!==m?"other":""} ${iso===today?"today":""}" onclick="openDay('${iso}')">
+      <div class="day-number">${d.getDate()}</div>
+      <div class="dot-wrap">${events.slice(0,5).map(()=>`<span class="dot"></span>`).join("")}</div>
+      ${events.length ? `<div class="day-count">${events.length} lembrete${events.length>1?"s":""}</div>`:""}
+    </div>`;
+  }
+  document.getElementById("calendarGrid").innerHTML=html;
+}
+function moveCalendar(n){ calendarCursor=new Date(calendarCursor.getFullYear(),calendarCursor.getMonth()+n,1); renderCalendar(); }
+function openDay(iso){
+  document.getElementById("reminderDate").value=iso;
+  const items=data.reminders.filter(r=>r.date===iso);
+  if(items.length){
+    alert(items.map(r=>`${r.client}${r.time?" • "+r.time:""}${r.note?"\n"+r.note:""}`).join("\n\n"));
+  }
+}
+
+function exportData(){
+  const blob=new Blob([JSON.stringify(data,null,2)],{type:"application/json"});
+  const a=document.createElement("a");
+  a.href=URL.createObjectURL(blob);
+  a.download=`agenda-b2b-backup-${isoDateLocal()}.json`;
+  a.click();
+  URL.revokeObjectURL(a.href);
+}
+function importData(event){
+  const file=event.target.files?.[0]; if(!file) return;
+  const reader=new FileReader();
+  reader.onload=()=>{
+    try{
+      const parsed=JSON.parse(reader.result);
+      if(!parsed.reminders || !parsed.sales || !parsed.goals) throw new Error();
+      if(confirm("Importar este backup e substituir os dados atuais?")){
+        data=parsed; saveData(); alert("Backup importado.");
+      }
+    }catch(e){ alert("Arquivo de backup inválido."); }
+    event.target.value="";
+  };
+  reader.readAsText(file);
+}
+function clearAllData(){
+  if(!confirm("Tem certeza que deseja apagar TODOS os dados?")) return;
+  if(!confirm("Essa ação não pode ser desfeita sem um backup. Confirmar?")) return;
+  data=defaultData(); localStorage.removeItem(STORAGE_KEY); renderAll();
+}
+
+function renderAll(){
+  setTodayDefaults();
+  document.getElementById("dashboardMonth").value=activeMonth;
+  document.getElementById("salesMonth").value=activeMonth;
+  document.getElementById("goalMonth").value=activeMonth;
+  document.getElementById("goalValue").value=data.goals[activeMonth] ?? "";
+  renderDashboard();
+  renderToday();
+  renderReminderList();
+  renderSales();
+  renderCalendar();
+}
+window.addEventListener("load",()=>{
+  renderAll();
+  const pendingToday=data.reminders.filter(r=>r.date===isoDateLocal() && r.status!=="done");
+  if(pendingToday.length){
+    setTimeout(()=>openTodayModal(),250);
+    setTimeout(()=>notifyToday(),500);
+  }
+});
+</script>
+</body>
+</html>
